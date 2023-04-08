@@ -16,6 +16,9 @@ builder.Services.AddDbContext<Context>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("ConStr")
 ));
 
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<Context>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
