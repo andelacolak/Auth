@@ -40,6 +40,8 @@ namespace Auth.API.Controllers
                 return BadRequest(new RegistrationResponseDTO { Errors = errors });
             }
 
+            await _userManager.AddToRoleAsync(user, "Viewer");
+
             return StatusCode(200);
         }
 
@@ -52,7 +54,7 @@ namespace Auth.API.Controllers
                 return Unauthorized(new AuthResponseDTO { ErrorMessage = "Invalid Authentication" });
 
             var signingCredentials = _jwtHandler.GetSigningCredentials();
-            var claims = _jwtHandler.GetClaims(user);
+            var claims = await _jwtHandler.GetClaims(user);
             var tokenOptions = _jwtHandler.GenerateTokenOptions(signingCredentials, claims);
             var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 

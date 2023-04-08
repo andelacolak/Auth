@@ -1,7 +1,9 @@
 ﻿using Auth.API.Models;
+using Auth.API.Models.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Reflection.Emit;
 
 namespace Auth.API
 {
@@ -21,6 +23,14 @@ namespace Auth.API
         public Context(DbContextOptions<Context> options)
             : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            //Add seeds
+            builder.ApplyConfiguration(new RoleConfiguration());
+
+            base.OnModelCreating(builder);
         }
 
         //Idenitity needs this. Don't know why cause con str is already defined in program.cs

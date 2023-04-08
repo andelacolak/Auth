@@ -20,9 +20,15 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<Context>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("ConStr")
+
 ));
 
-builder.Services.AddIdentity<User, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>(opt =>
+{
+    opt.Password.RequiredLength = 7;
+    opt.Password.RequireDigit = false;
+    opt.User.RequireUniqueEmail = true;
+})
     .AddEntityFrameworkStores<Context>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
