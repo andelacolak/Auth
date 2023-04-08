@@ -1,8 +1,10 @@
 ﻿using Auth.API.DTOs;
+using Auth.API.JwtFeatures;
 using Auth.API.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Auth.API.Controllers
 {
@@ -13,11 +15,13 @@ namespace Auth.API.Controllers
         //Identity lib handles this
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly JwtHandler _jwtHandler;
 
-        public AccountsController(UserManager<User> userManager, IMapper mapper)
+        public AccountsController(UserManager<User> userManager, IMapper mapper, JwtHandler jwtHandler)
         {
             _userManager = userManager;
             _mapper = mapper;
+            _jwtHandler = jwtHandler;
         }
 
         [HttpPost("Registration")]
@@ -37,6 +41,22 @@ namespace Auth.API.Controllers
             }
 
             return StatusCode(200);
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] UserAuthenticationDTO userForAuthentication)
+        {
+            var user = await _userManager.FindByNameAsync(userForAuthentication.Email);
+
+            if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
+                return Unauthorized(new AuthResponseDTO { ErrorMessage = "Invalid Authentication" });
+
+            var signingCredentials = _jwtHandler.GetSigningCredentials();
+            var claims = _jwtHandler.GetClaims(user);
+            var tokenOptions = _jwtHandler.GenerateTokenOptions(signingCredentials, claims);
+            var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            return Ok(new AuthResponseDTO { IsAuthSuccessful = true, Token = token });
         }
     }
 }
