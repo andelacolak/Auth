@@ -1,6 +1,8 @@
 using Auth.API;
+using Auth.API.Mapper;
 using Auth.API.Models;
-using Microsoft.AspNet.Identity.EntityFramework;
+using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,15 @@ builder.Services.AddDbContext<Context>(options => options.UseSqlServer(
 
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<Context>();
+
+// Auto Mapper Configurations
+var mappingConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new MappingProfile());
+});
+
+IMapper mapper = mappingConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 
