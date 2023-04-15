@@ -11,7 +11,7 @@ export class AuthenticationService {
   constructor(private http: HttpClient) { }
 
   public registerUser = (route: string, body: UserRegistrationDTO) => {
-    return this.http.post<RegistrationResponseDTO> (this.createCompleteRoute(route, "https://localhost:7096/"), body);
+    return this.http.post<RegistrationResponseDTO> (this.createCompleteRoute(route, "https://localhost:7096"), body);
   }
 
   private createCompleteRoute = (route: string, envAddress: string) => {
